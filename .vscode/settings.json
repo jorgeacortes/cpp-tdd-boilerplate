@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.scons": "python",
+        "*.sco": "python",
+        "SConscript": "python",
+        "SConstruct": "python",
+    }
+}

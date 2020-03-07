@@ -1,0 +1,171 @@
+#!python
+# Main SConscript file for the project
+import os, platform, datetime
+Import('cwd')
+#*************************
+# Input arguments definition
+#*************************
+vars = Variables(None, ARGUMENTS)
+vars.AddVariables(
+    EnumVariable('BUILD_TYPE', 'type of build to use', 'debug',  allowed_values=('debug', 'release')),
+    EnumVariable('MOCK', 'Launch CMock or not', 'no',  allowed_values=('no', 'yes')),
+    EnumVariable('TEST_ONLY', 'Compile only tests', 'no',  allowed_values=('no', 'yes')),
+    EnumVariable('APP_ONLY', 'Compile only app', 'no',  allowed_values=('no', 'yes')),
+    )
+
+#*************************
+# Config
+#*************************
+
+tgtDir = '#/build/' # <#/Dir> is relative to SConstruct file directory
+tgtName = 'app'
+
+compStr = (
+    "********************************************************************************\n"
+    "[Compiling] $TARGET\n"
+    "--------------------------------------------------------------------------------")
+linkStr = (
+    "********************************************************************************\n"
+    "[Linking] $TARGET\n"
+    "--------------------------------------------------------------------------------")
+
+ccflags_list = [
+    "-Wall",    # Show compiler warnings
+    #'-O2',     #
+    #'-m32'
+    ]
+
+cxxflags_list = [
+    #"-std=c++11"
+]
+# Include Path
+include_path_list = [ #TODO: Pending to include all header files recursively?
+    '#/src/func1/',
+    ]
+
+# Common libraries for both app and test
+library_path_list = [
+    '#/build/src/',
+]
+
+# For including external libraries
+library_list =[
+    '',
+]
+
+build_app_scripts = [
+    'src/app.scons',    # App project
+]
+
+build_test_scripts = [
+    'tests/test.scons', # Test project
+]
+
+defines_list = [    # List of defines to include
+    'TAG1'          # Sample tag in func1, remove as needed
+]
+
+# String with all headers files to mock finishing with a space as separation
+mocks_list = (
+    os.path.join(cwd,"src","func1","Mod1.h")
+    #os.path.join(cwd,"src","func1","yyyy.h")
+)
+
+tools_list = [
+    'default'
+]
+
+#*************************
+# Methods
+#*************************
+# Method for creating all mocks using CMock
+def buildMocks():
+    # TODO
+    print("********************************************************************************")
+    print("[Info] Finished project.scons mocks creation")
+    print("********************************************************************************"  )
+    exit(ret)
+
+#*************************
+# Script
+#*************************
+print("********************************************************************************")
+print("[Info] Starting project.scons ",datetime.datetime.now())
+print("********************************************************************************")
+print('[Info] cwd = ', cwd)
+
+if platform.system()=='Windows':
+    tools_list = ['mingw']
+    print('[Info] Windows OS detected: using MinGw')
+
+main_env = Environment(
+    variables =     vars,               # For input arguments
+    #CC =            'gcc',
+    #CXX =           'g++',
+    #AS =            '',
+    TARGET_ARCH =   'x86',              # Otherwise use x86_64
+    CPPPATH =       include_path_list,
+    CCFLAGS =       ccflags_list,
+    CXXFLAGS =      cxxflags_list,
+    LIBPATH =       library_path_list,
+    LIBS =          library_list,
+    CPPDEFINES =    defines_list,
+    TOOLS =         tools_list,
+    CCCOMSTR =      compStr,
+    LINKCOMSTR =    linkStr,
+    # Custom parameters
+    tgtDir =        tgtDir,             # Target directory
+    tgtName =       tgtName,            # Target name
+    cwd =           cwd,                # Parent cwd
+)
+
+
+#*************************
+# Arguments processing
+#*************************
+
+if main_env.GetOption('clean'):
+    print('[Info] Cleaning extra files.')
+    Clean(
+        tgtName,                # Target
+        [                       # Files or directories to remove
+            "#/build/*",        # We shouldn't remove build folder
+            # Remember GoogleTest is set as NoClean in test.scons
+        ]
+    )
+
+if main_env['BUILD_TYPE'] == 'debug':
+    main_env.Append(
+        CCFLAGS = '-g'  # Debug flag
+    )
+    print('[Info] Debug build.')
+
+if main_env['BUILD_TYPE'] == 'release':
+    print('[Info] Release build.')
+
+if main_env['MOCK'] == 'yes':
+    print('[Info] Creating mocks with CMock.')
+    buildMocks()
+
+#*************************
+# Debug console print(ng)
+#*************************
+print("[Info][main_env] CC =", main_env['CC'])
+print("[Info][main_env] TARGET_ARCH =", main_env['TARGET_ARCH'])
+print("[Info][main_env] CCFLAGS =", main_env['CCFLAGS'])
+print("[Info][main_env] CPPDEFINES =", main_env['CPPDEFINES'])
+
+# Launch all SConscripts
+print("--------------------------------------------------------------------------------")
+if main_env['TEST_ONLY'] == 'no':
+    for script in build_app_scripts:
+        env = main_env.Clone()
+        SConscript(script, exports=['env'])
+if main_env['APP_ONLY'] == 'no':
+    for script in build_test_scripts:
+        env = main_env.Clone()
+        SConscript(script, exports=['env'])
+
+print("********************************************************************************")
+print("[Info] Finished project.scons")
+print("********************************************************************************")

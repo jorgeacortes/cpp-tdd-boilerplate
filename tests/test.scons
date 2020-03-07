@@ -1,0 +1,93 @@
+# Test SCONS script.
+# TODO Run all runners after build.
+import os
+Import('env')
+Import('productionCodeObjs')
+envTest = env.Clone()
+
+testRelativePath = '..' # With <#> it creates also object files at vendor folder.
+
+gmock_path_src = testRelativePath + '/vendor/gtest/googlemock/src/'
+gtest_path_src = testRelativePath + '/vendor/gtest/googletest/src/'
+
+gtest_path_inc = [
+    gtest_path_src + '../include/gtest/',
+    gtest_path_src + '../include/',
+    gtest_path_src + '..'
+]
+
+# --------------- Support libraries ---------------- #
+print('[SConscript] test.scons')
+
+# Create lib for Unity and CMock
+envTest.Append(
+    CPPPATH = [
+        gtest_path_inc
+    ],
+    CXXFLAGS = [
+        "-std=c++11"    # Required for gtest
+    ]
+)
+
+gtest_sources = [ Glob(gtest_path_src+'*.cc') ]
+gtest_objs = []
+
+# Compile Google Test obj
+for source in gtest_sources:
+    gtest_objs.extend(envTest.Object(source))
+
+gtest_lib = envTest.StaticLibrary(
+    target = 'GoogleTest',
+    source = [
+        gtest_objs
+    ]
+)
+
+# Don't clean GoogleTest, it won't change.
+NoClean( [
+    gtest_lib,
+    gtest_objs,
+    ]
+)
+
+# --------------- Tests -------------------------- #
+
+# Take all sources
+tests_sources=[
+    Glob('mocks/*.cc')
+]
+
+#Print(ng results of the Glob)
+""" print('*******************')
+for items in tests_sources:
+    print(items)
+    for i in items:
+        print(i)
+print('*******************') """
+
+# Include paths (CPPATHS)
+tests_inc = [
+    'mocks',
+]
+
+envTest.Append(
+    LIBS = gtest_lib,
+    CPPPATH = tests_inc
+)
+
+envTest['tgtName'] = 'Tests'
+
+testCodeObjs = []
+if tests_sources[0]: # If the list of files is not empty.
+    print("[Info] tests sources list")
+    print("------------------------")
+    for source in tests_sources:
+        print(source[0])
+        testCodeObjs.extend(envTest.Object(source))
+    print("--------------------------------------------------------------------------------")
+
+# And then we compile the test including the library.
+runner1_bin = envTest.Program(
+    target = envTest['tgtDir'] + 'testRunner1',
+    source = ['runner1.cc', productionCodeObjs, testCodeObjs]
+)
