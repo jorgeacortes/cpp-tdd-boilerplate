@@ -12,6 +12,7 @@ gmock_path_src = testRelativePath + '/vendor/gtest/googlemock/src/'
 gtest_path_src = testRelativePath + '/vendor/gtest/googletest/src/'
 
 gtest_path_inc = [
+    gtest_path_src + '../include/gtest/',
     gtest_path_src + '../include/',
     gtest_path_src + '..'
 ]
@@ -23,8 +24,25 @@ print('[SConscript] test.scons')
 envTest.Append(
     CPPPATH = [
         gtest_path_inc
+    ],
+    CPPFLAGS = [
+        "-isystem",
+        "-pthread",
+        "-Wextra"
     ]
 )
+
+# Seems like mingw doesn't like those and g++ needs them.
+if 'mingw' not in envTest['TOOLS']:
+    print("hola")
+    envTest.Append(
+        CPPFLAGS = [
+            "-std=c++11",
+        ],
+        LIBS = [
+            "pthread"
+        ]
+    )
 
 gtest_sources = [ Glob(gtest_path_src+'*.cc') ]
 gtest_objs = []

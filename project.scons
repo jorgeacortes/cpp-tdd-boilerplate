@@ -90,7 +90,7 @@ def buildMocks():
 # Script
 #*************************
 print("********************************************************************************")
-print("[Info] Starting project.scons ",datetime.datetime.now())
+print("[Info] Starting project.scons ",str(datetime.datetime.now()))
 print("********************************************************************************")
 print('[Info] cwd = ', cwd)
 
