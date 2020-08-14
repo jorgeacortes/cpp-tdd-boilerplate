@@ -1,5 +1,6 @@
 # Test SCONS script.
 # TODO Run all runners after build.
+# TODO Include gmock
 import os
 Import('env')
 Import('productionCodeObjs')
@@ -11,7 +12,6 @@ gmock_path_src = testRelativePath + '/vendor/gtest/googlemock/src/'
 gtest_path_src = testRelativePath + '/vendor/gtest/googletest/src/'
 
 gtest_path_inc = [
-    gtest_path_src + '../include/gtest/',
     gtest_path_src + '../include/',
     gtest_path_src + '..'
 ]
@@ -19,20 +19,17 @@ gtest_path_inc = [
 # --------------- Support libraries ---------------- #
 print('[SConscript] test.scons')
 
-# Create lib for Unity and CMock
+# Create lib for google test
 envTest.Append(
     CPPPATH = [
         gtest_path_inc
-    ],
-    CXXFLAGS = [
-        "-std=c++11"    # Required for gtest
     ]
 )
 
 gtest_sources = [ Glob(gtest_path_src+'*.cc') ]
 gtest_objs = []
 
-# Compile Google Test obj
+# Compile Google Test objs
 for source in gtest_sources:
     gtest_objs.extend(envTest.Object(source))
 
@@ -56,14 +53,6 @@ NoClean( [
 tests_sources=[
     Glob('mocks/*.cc')
 ]
-
-#Print(ng results of the Glob)
-""" print('*******************')
-for items in tests_sources:
-    print(items)
-    for i in items:
-        print(i)
-print('*******************') """
 
 # Include paths (CPPATHS)
 tests_inc = [

@@ -1,10 +1,9 @@
-#include <stdio.h>
+#ifndef _FUNC1_H_
+#define _FUNC1_H_
 
-typedef unsigned char dTbit;
-typedef unsigned char dTu8;
-typedef unsigned short dTu16;
-typedef unsigned int dTu32;
-
+#include <stdint.h>
 
 int func1(void);
-dTu8 receiveInputAndReturnBoolean(void);
+uint8_t receiveInputAndReturnBoolean(void);
+
+#endif /* _FUNC1_H_ */

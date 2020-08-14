@@ -48,5 +48,5 @@ Feel free to contribute opening issues or pull requests.
 ## To do list
 
 * Automatically launch all runners and show results.
-* Include CMock example
+* Include GMock
 * Include sample class and fixtures
