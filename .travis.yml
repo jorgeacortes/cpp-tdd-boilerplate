@@ -1,0 +1,10 @@
+language: cpp
+
+services:
+- docker
+
+before_script:
+- docker pull cortesja/scons:latest
+
+script:
+- docker run --rm -v $(pwd):/ws -w /ws cortesja/scons:latest bash -c "scons"
