@@ -1,6 +1,8 @@
 # C/C++ Test Driven Development boilerplate
 > Ready to go boilerplate for doing TDD for C/C++ and SCons as build system.
 
+[![Build Status](https://travis-ci.org/jorgeacortes/cpp-tdd-boilerplate.svg?branch=master)](https://travis-ci.org/jorgeacortes/cpp-tdd-boilerplate)
+
 Boilerplate for C/C++ development using TDD and [SCons](https://github.com/SCons/scons).
 
 Uses [GoogleTest](https://github.com/google/googletest/) for unit testing and to create mocks.
